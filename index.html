@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeonMine - Mining & Referral</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .background-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 200, 255, 0.1), rgba(150, 0, 255, 0.1));
+            animation: backgroundShift 20s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes backgroundShift {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        #container {
+            background-color: #2a2a4a;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            margin: 20px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh; /* Make container tall enough to fill screen */
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #00c8ff;
+            font-weight: 700;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-bottom: 1px solid #3a3a5a;
+            margin-bottom: 20px;
+        }
+
+        .user-info div {
+            flex: 1;
+            text-align: center;
+        }
+
+        .user-info p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #a0a0c0;
+        }
+
+        .user-info .value {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #00e676;
+        }
+
+        /* Mining Section */
+        #main-mining-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1; /* Allow this section to take available space */
+        }
+
+        .mining-area {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+        }
+
+        .progress-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #3a3a5a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-circle svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg); /* Start progress from top */
+        }
+
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .progress-circle .bg {
+            stroke: #4a4a6a;
+        }
+
+        .progress-circle .progress {
+            stroke: #00c8ff;
+            transition: stroke-dashoffset 0.5s linear;
+        }
+
+        .circle-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: #e0e0e0;
+        }
+
+        .circle-content h2 {
+            font-size: 1.8em;
+            margin: 0;
+            color: #00e676;
+        }
+
+        .circle-content p {
+            font-size: 0.8em;
+            margin: 5px 0;
+            color: #a0a0c0;
+        }
+
+        #claimBtn {
+            background-color: #00e676;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 250px;
+        }
+
+        #claimBtn:hover:not(:disabled) {
+            background-color: #00c853;
+            transform: translateY(-2px);
+        }
+
+        #claimBtn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        #claimBtn:disabled {
+            background-color: #5a5a7a;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #ff5252;
+        }
+
+        .section-title {
+            color: #00c8ff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3a3a5a;
+            padding-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            flex-grow: 1; /* Allow this section to take available space */
+            padding-bottom: 70px; /* Space for bottom nav */
+        }
+
+        /* Referral Section */
+        .referral-input-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .referral-input-group label {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #a0a0c0;
+        }
+
+        .referral-input-group input {
+            padding: 10px;
+            border: 1px solid #4a4a6a;
+            border-radius: 8px;
+            background-color: #3a3a5a;
+            color: #e0e0e0;
+            font-family: 'Roboto Mono', monospace;
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .referral-input-group button {
+            background-color: #8e24aa;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .referral-input-group button:hover {
+            background-color: #6a1b9a;
+        }
+
+        #referral-team-list, #task-list, #leaderboard-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            text-align: left;
+            margin-top: 20px;
+            max-height: 400px; /* Limit height for scrolling */
+            overflow-y: auto; /* Enable scrolling */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #5a5a7a #3a3a5a; /* Firefox */
+        }
+
+        #referral-team-list::-webkit-scrollbar,
+        #task-list::-webkit-scrollbar,
+        #leaderboard-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #referral-team-list::-webkit-scrollbar-track,
+        #task-list::-webkit-scrollbar-track,
+        #leaderboard-list::-webkit-scrollbar-track {
+            background: #3a3a5a;
+            border-radius: 10px;
+        }
+
+        #referral-team-list::-webkit-scrollbar-thumb,
+        #task-list::-webkit-scrollbar-thumb,
+        #leaderboard-list::-webkit-scrollbar-thumb {
+            background-color: #5a5a7a;
+            border-radius: 10px;
+            border: 2px solid #3a3a5a;
+        }
+
+        #referral-team-list li, #task-list li, #leaderboard-list li {
+            background-color: #3a3a5a;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #e0e0e0;
+            font-size: 0.95em;
+        }
+
+        #task-list li a {
+            color: #00c8ff;
+            text-decoration: none;
+            font-weight: 600;
+            flex-grow: 1;
+            display: block; /* Make the link fill the li */
+            padding: 0; /* Remove default link padding */
+        }
+
+        #task-list li.completed-task {
+            background-color: #4a6a5a; /* A darker green for completed tasks */
+            color: #c0f0c0;
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+
+        #task-list li.processing-task {
+            background-color: #6a5a4a; /* An orange/brown for processing */
+            color: #ffeb3b;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        /* Bottom Navigation */
+        #bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            background-color: #2a2a4a;
+            padding: 10px 0;
+            border-top: 1px solid #3a3a5a;
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            z-index: 10;
+            margin-top: auto; /* Push to bottom */
+            border-radius: 0 0 20px 20px; /* Match container border-radius */
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #bottom-nav button {
+            background: none;
+            border: none;
+            color: #a0a0c0;
+            font-size: 0.8em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            width: 20%; /* Distribute equally */
+        }
+
+        #bottom-nav button i {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        #bottom-nav button:hover,
+        #bottom-nav button.active {
+            color: #00c8ff;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            #container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .user-info .value {
+                font-size: 1.1em;
+            }
+
+            #claimBtn {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            #bottom-nav button {
+                font-size: 0.75em;
+                padding: 5px 2px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="background-effect"></div>
+
+    <div id="container">
+        <header>
+            <h1>NeonMine</h1>
+            <p>Your Path to Digital Wealth</p>
+        </header>
+
+        <div class="user-info">
+            <div>
+                <p>User ID:</p>
+                <p class="value" id="userId">N/A</p>
+            </div>
+            <div>
+                <p>User Name:</p>
+                <p class="value" id="userName">Loading...</p>
+            </div>
+            <div>
+                <p>Balance:</p>
+                <p class="value" id="balance">0</p>
+            </div>
+        </div>
+
+        <div id="main-mining-view" class="content-section">
+            <div class="mining-area">
+                <div class="progress-circle">
+                    <svg width="100%" height="100%" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="56" class="bg"></circle>
+                        <circle cx="60" cy="60" r="56" class="progress"></circle>
+                    </svg>
+                    <div class="circle-content">
+                        <h2 id="progressText">0%</h2>
+                        <p id="miningStatus">Mining in progress: 0% complete</p>
+                    </div>
+                </div>
+            </div>
+            <button id="claimBtn" onclick="claim()">Claim 10 Coins</button>
+            <p id="message"></p>
+        </div>
+
+        <div id="tasks-section" class="content-section">
+            <h2 class="section-title">Daily Tasks</h2>
+            <ul id="task-list">
+                <li>Loading tasks...</li>
+            </ul>
+        </div>
+
+        <div id="referral-section" class="content-section">
+            <h2 class="section-title">Referral</h2>
+            <div class="referral-input-group">
+                <label for="referralIdInput">Enter Referral Code:</label>
+                <input type="text" id="referralIdInput" placeholder="Your Friend's Code">
+                <button onclick="register()">Register Referral</button>
+                <p id="registerMsg" style="margin-top: 10px; color: #ffeb3b; font-size: 0.9em;"></p>
+            </div>
+            <hr style="border-color: #3a3a5a; width: 80%; margin: 20px auto;">
+            <h3 style="color: #00e676; margin-bottom: 15px;">Your Referral Code:</h3>
+            <p id="yourReferralCode" style="font-family: 'Roboto Mono', monospace; font-size: 1.2em; font-weight: 700; background-color: #3a3a5a; padding: 10px; border-radius: 8px; display: inline-block; user-select: all; cursor: copy;" onclick="navigator.clipboard.writeText(this.textContent); alert('Referral code copied!');">USERID123</p>
+            <p style="font-size: 0.8em; color: #a0a0c0; margin-top: 5px;">Click to copy your ID.</p>
+        </div>
+
+        <div id="referral-team-section" class="content-section">
+            <h2 class="section-title">Your Referral Team</h2>
+            <ul id="referral-team-list">
+                <li>Loading team...</li>
+            </ul>
+        </div>
+
+        <div id="leaderboard-section" class="content-section">
+            <h2 class="section-title">Leaderboard</h2>
+            <ul id="leaderboard-list">
+                <li>Loading leaderboard...</li>
+            </ul>
+        </div>
+
+        <div id="tge-section" class="content-section">
+            <h2 class="section-title">TGE Coming Soon</h2>
+            <p style="text-align: center; font-size: 1.1em; color: #a0a0c0;">
+                Token Generation Event (TGE) details will be announced soon. Stay tuned for exciting updates!
+            </p>
+            <img src="https://via.placeholder.com/200" alt="TGE Placeholder" style="max-width: 80%; height: auto; margin-top: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
+        </div>
+
+        <div id="bottom-nav">
+            <button onclick="showMiningView()" id="mineNavBtn" class="active">
+                <i class="fas fa-hammer"></i>
+                <span>Mine</span>
+            </button>
+            <button onclick="showSection('tasks-section')" id="tasksNavBtn">
+                <i class="fas fa-tasks"></i>
+                <span>Tasks</span>
+            </button>
+            <button onclick="showSection('referral-section')" id="referralNavBtn">
+                <i class="fas fa-share-alt"></i>
+                <span>Referral</span>
+            </button>
+            <button onclick="showSection('referral-team-section')" id="teamNavBtn">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+            </button>
+            <button onclick="showSection('leaderboard-section')" id="leaderboardNavBtn">
+                <i class="fas fa-trophy"></i>
+                <span>Board</span>
+            </button>
+            <button onclick="showSection('tge-section')" id="tgeNavBtn">
+                <i class="fas fa-coins"></i>
+                <span>TGE</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // আপনার ওয়েব অ্যাপ URL এখানে দিন
+        // এটি আপনার Apps Script ওয়েব অ্যাপের URL হবে, যা ডিপ্লয়মেন্টের পর পাবেন
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzctXiAXMywKe1X25gFsA37MKEYcWjy7VGgnzaECgTeEPjAQ4OSy01smsWd4pDjmnUaUQ/exec';
+
+        // আপনার ব্যবহারকারীর আইডি, যা আপনি গুগল শীটে সেভ করেছেন।
+        // প্রোডাকশন অ্যাপে এই আইডি সাধারণত ইউজার লগইন বা টেলিগ্রাম আইডি থেকে আসে।
+        const CURRENT_USER_ID = 'user123'; 
+
+        let user = {}; // ইউজার ডেটা এখন শীট থেকে আসবে
+        let adminTasks = []; // টাস্ক ডেটা এখন শীট থেকে আসবে
+
+        // --- ডেটা লোডিং ফাংশন ---
+        async function fetchFromSheet(sheetName, userId = null) {
+            let url = `${WEB_APP_URL}?sheet=${sheetName}`;
+            if (userId) {
+                url += `&userId=${userId}`;
+            }
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    console.error("Sheet API Error:", data.error);
+                    return null;
+                }
+                return data;
+            } catch (error) {
+                console.error("Error fetching data from Google Sheet:", error);
+                return null;
+            }
+        }
+
+        // --- শীটে ডেটা পাঠানোর (POST) ফাংশন ---
+        async function sendDataToSheet(action, userId, sheetName, dataToUpdate) {
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        userId: userId,
+                        sheet: sheetName,
+                        data: dataToUpdate
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (!result.success) {
+                    console.error("Sheet Update Error:", result.error);
+                    return { success: false, message: result.error };
+                }
+                return { success: true, message: result.message };
+            } catch (error) {
+                console.error("Error sending data to Google Sheet:", error);
+                return { success: false, message: error.toString() };
+            }
+        }
+
+        // --- UI আপডেট ফাংশন ---
+        function updateButtonState() {
+            const btn = document.getElementById('claimBtn');
+            const msg = document.getElementById('message');
+            const progressCircle = document.querySelector('.progress-circle .progress');
+            const progressText = document.getElementById('progressText');
+            const miningStatus = document.getElementById('miningStatus');
+
+            const circumference = 2 * Math.PI * 56;
+            progressCircle.style.strokeDasharray = circumference;
+
+            if (!user || !user.LastClaimTimestamp || user.LastClaimTimestamp === "") {
+                btn.disabled = false;
+                msg.textContent = "You can claim now!";
+                progressCircle.style.strokeDashoffset = circumference; // Full circle (0% progress)
+                progressText.textContent = "0%";
+                miningStatus.textContent = "Mining in progress: 0% complete";
+                return;
+            }
+
+            const last = new Date(user.LastClaimTimestamp);
+            const now = new Date();
+            const diffMs = now - last;
+            const totalMs = 24 * 60 * 60 * 1000;
+            const progress = Math.min((diffMs / totalMs) * 100, 100);
+            const dashOffset = circumference - (circumference * (progress / 100));
+            progressCircle.style.strokeDashoffset = dashOffset;
+            progressText.textContent = `${Math.round(progress)}%`;
+            miningStatus.textContent = `Mining in progress: ${Math.round(progress)}% complete`;
+
+            const diffH = diffMs / (1000 * 60 * 60);
+            if (diffH >= 24) {
+                btn.disabled = false;
+                msg.textContent = "You can claim now!";
+                progressCircle.style.strokeDashoffset = 0; // Empty circle (100% progress)
+                progressText.textContent = "100%";
+                miningStatus.textContent = "Mining complete! Ready to claim.";
+            } else {
+                btn.disabled = true;
+                const hoursLeft = Math.ceil(24 - diffH);
+                msg.textContent = `Please wait ${hoursLeft} hour(s) to claim again.`;
+            }
+        }
+
+        // --- ক্লেইম ফাংশন (এখন শীটে ডেটা আপডেট হবে) ---
+        async function claim() {
+            if (document.getElementById('claimBtn').disabled) return;
+
+            const originalBalance = parseInt(user.Balance);
+            const newBalance = originalBalance + 10;
+            const newTimestamp = new Date().toISOString(); // ISO 8601 format
+
+            // UI আপডেট (অস্থায়ী, নিশ্চিত হওয়ার আগে)
+            user.Balance = newBalance;
+            user.LastClaimTimestamp = newTimestamp;
+            document.getElementById('balance').textContent = newBalance;
+            updateButtonState();
+            document.getElementById('message').textContent = "Claiming..."; // লোডিং স্টেট
+
+            // গুগল শীটে ডেটা আপডেট পাঠান
+            const updateResult = await sendDataToSheet(
+                'ClaimPoints', // অ্যাকশন নাম
+                CURRENT_USER_ID,
+                'Users', // যে শীট আপডেট হবে
+                {
+                    'Balance': newBalance,
+                    'LastClaimTimestamp': newTimestamp
+                }
+            );
+
+            if (updateResult.success) {
+                alert("✅ You claimed 10 points!");
+                // ডেটা নিশ্চিত হলে চূড়ান্ত UI আপডেট
+                document.getElementById('message').textContent = "Claim successful!";
+            } else {
+                alert(`❌ Claim failed: ${updateResult.message}`);
+                // ব্যর্থ হলে UI পূর্বাবস্থায় ফিরিয়ে আনুন বা ত্রুটি দেখান
+                user.Balance = originalBalance; // ব্যালেন্স ফিরিয়ে আনুন
+                // user.LastClaimTimestamp আগের অবস্থায় ফিরিয়ে আনুন (যদি সম্ভব হয়)
+                document.getElementById('balance').textContent = originalBalance;
+                updateButtonState(); // বাটন স্টেট আবার চেক করুন
+                document.getElementById('message').textContent = `Claim failed: ${updateResult.message}`;
+            }
+        }
+
+        // --- রেফারেল রেজিস্টার ফাংশন (এখন শীটে ডেটা আপডেট হবে) ---
+        async function register() {
+            const refId = document.getElementById('referralIdInput').value.trim();
+            const registerMsg = document.getElementById('registerMsg');
+
+            // লোড করা ব্যবহারকারীর ডেটার উপর ভিত্তি করে রেফারেল চেক করুন
+            if (user.ReferralClaimed === true || user.ReferralClaimed === "TRUE") { // Google Sheet থেকে "TRUE" বা "FALSE" স্ট্রিং আসতে পারে
+                registerMsg.textContent = 'Referral already claimed!';
+                return;
+            }
+
+            // এখানে আপনি আপনার শীটে থাকা রেফারেল কোডগুলোর সাথে `refId` মিলিয়ে দেখতে পারেন।
+            // আপাতত একটি ডামি চেক করছি।
+            // আদর্শভাবে, `doPost` ফাংশনে এই ভ্যালিডেশন হওয়া উচিত।
+            const validReferralCode = "REF123"; // আপনার শীট থেকে আসা একটি বৈধ রেফারেল কোড
+
+            if (refId === validReferralCode) {
+                const originalBalance = parseInt(user.Balance);
+                const newBalance = originalBalance + 100;
+
+                // UI আপডেট (অস্থায়ী)
+                user.Balance = newBalance;
+                user.ReferralClaimed = true; // ক্লায়েন্ট-সাইডে স্ট্যাটাস আপডেট
+                document.getElementById('balance').textContent = newBalance;
+                registerMsg.textContent = `Registering with referral ID: ${refId}...`;
+
+                // গুগল শীটে ডেটা আপডেট পাঠান
+                const updateResult = await sendDataToSheet(
+                    'RegisterReferral',
+                    CURRENT_USER_ID,
+                    'Users',
+                    {
+                        'Balance': newBalance,
+                        'ReferralClaimed': true // Google Sheets এ boolean মান "TRUE" বা "FALSE" হিসেবে সেভ হতে পারে।
+                    }
+                );
+
+                if (updateResult.success) {
+                    registerMsg.textContent = `Registered with referral ID: ${refId}. You earned 100 points!`;
+                    // রেফারেল টিম লোড করুন (যদি আপনার শীটে রেফারেল টিম আপডেট হয়)
+                    // loadReferralTeam(); // এই ফাংশনটি আপডেট করতে হতে পারে
+                } else {
+                    registerMsg.textContent = `Referral registration failed: ${updateResult.message}`;
+                    // ব্যর্থ হলে UI পূর্বাবস্থায় ফিরিয়ে আনুন
+                    user.Balance = originalBalance;
+                    user.ReferralClaimed = false;
+                    document.getElementById('balance').textContent = originalBalance;
+                }
+            } else {
+                registerMsg.textContent = 'Invalid referral code!';
+            }
+        }
+
+        // --- টাস্ক সম্পন্ন করার ফাংশন (এখন শীটে ডেটা আপডেট হবে) ---
+        async function completeTask(taskId) {
+            // CompletedTasks শীট থেকে কমা দিয়ে আলাদা করা স্ট্রিং হিসেবে আসবে, তাই এটিকে অ্যারেতে রূপান্তর করতে হবে
+            let completedTasksArray = user.CompletedTasks ? user.CompletedTasks.split(',').map(s => s.trim()).filter(s => s) : [];
+
+            if (completedTasksArray.includes(taskId)) {
+                alert("You have already completed this task!");
+                return;
+            }
+
+            const taskElement = document.querySelector(`li[data-task-id="${taskId}"]`);
+            if (taskElement) {
+                taskElement.classList.add('processing-task'); // প্রসেসিং স্টেট দেখান
+            }
+
+            const originalBalance = parseInt(user.Balance);
+            const newBalance = originalBalance + 20;
+            completedTasksArray.push(taskId);
+            const newCompletedTasks = completedTasksArray.join(','); // আবার স্ট্রিং হিসেবে সেভ করুন
+
+            // UI আপডেট (অস্থায়ী)
+            user.Balance = newBalance;
+            user.CompletedTasks = newCompletedTasks;
+            document.getElementById('balance').textContent = newBalance;
+            if (taskElement) {
+                taskElement.classList.add('completed-task');
+                taskElement.classList.remove('processing-task');
+            }
+
+            // গুগল শীটে ডেটা আপডেট পাঠান
+            const updateResult = await sendDataToSheet(
+                'CompleteTask',
+                CURRENT_USER_ID,
+                'Users',
+                {
+                    'Balance': newBalance,
+                    'CompletedTasks': newCompletedTasks
+                }
+            );
+
+            if (updateResult.success) {
+                alert(`🎉 You completed a task and earned 20 points! Total balance: ${user.Balance}`);
+                // টাস্ক সম্পন্ন হওয়ার পর UI আপডেট করার জন্য loadTasks() কল করুন
+                // init() কল করলে পুরো ডেটা আবার লোড হবে এবং UI রিফ্রেশ হবে।
+                init(); 
+            } else {
+                alert(`❌ Task completion failed: ${updateResult.message}`);
+                // ব্যর্থ হলে UI পূর্বাবস্থায় ফিরিয়ে আনুন
+                user.Balance = originalBalance;
+                user.CompletedTasks = completedTasksArray.filter(id => id !== taskId).join(','); // টাস্ক সরান
+                document.getElementById('balance').textContent = originalBalance;
+                if (taskElement) {
+                    taskElement.classList.remove('completed-task');
+                }
+                // আবার টাস্ক লোড করুন যাতে সঠিক অবস্থা দেখানো হয়
+                loadTasks(); 
+            }
+        }
+
+        // --- টাস্ক লোড করার ফাংশন (এখন শীট থেকে) ---
+        async function loadTasks() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '<li style="opacity: 0.7;">Loading tasks...</li>'; // লোডিং স্টেট
+
+            const fetchedTasks = await fetchFromSheet('Tasks'); // 'Tasks' শীট থেকে টাস্ক লোড করুন
+            if (fetchedTasks) {
+                adminTasks = fetchedTasks; // গ্লোবাল adminTasks ভেরিয়েবলে সেভ করুন
+                taskList.innerHTML = ''; // লোডিং টেক্সট সরান
+
+                // ব্যবহারকারীর CompletedTasks কে অ্যারেতে রূপান্তর করুন
+                const completedTasksArray = user.CompletedTasks ? user.CompletedTasks.split(',').map(s => s.trim()).filter(s => s) : [];
+
+                adminTasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.setAttribute('data-task-id', task['Task ID']); // শীট থেকে আসা কলাম নাম ব্যবহার করুন
+                    const a = document.createElement('a');
+                    a.href = task.URL;
+                    a.target = "_blank";
+                    a.textContent = task.Title;
+
+                    a.onclick = (event) => {
+                        // যদি টাস্ক ইতিমধ্যেই সম্পন্ন হয়ে থাকে বা প্রসেসিংয়ে থাকে, তাহলে কিছু করবেন না
+                        if (completedTasksArray.includes(task['Task ID']) || li.classList.contains('processing-task')) {
+                            event.preventDefault();
+                            return false;
+                        }
+                        // লিঙ্কে ক্লিক করলে নতুন ট্যাব খুলুক, কিন্তু তারপর আমরা টাস্ক সম্পন্ন করার ফাংশন কল করব
+                        // event.preventDefault(); // লিঙ্ক কাজ করাতে চাইলে এই লাইনটি কমেন্ট আউট করে দিন
+                        
+                        // এখানে আপনি ইউজারকে লিঙ্কে ক্লিক করে টাস্ক সম্পন্ন করতে সময় দিতে পারেন।
+                        // একটি ছোট ডিলে দিয়ে তারপর completeTask কল করুন।
+                        li.classList.add('processing-task'); // UI তে প্রসেসিং স্টেট দেখান
+                        setTimeout(() => {
+                            completeTask(task['Task ID']); // টাস্ক আইডি পাস করুন
+                            li.classList.remove('processing-task');
+                            // completeTask ফাংশন এখন নিজে init() বা loadTasks() কল করবে সফল হলে
+                        }, 1000); // 1 সেকেন্ড ডিলে
+                    };
+
+                    if (completedTasksArray.includes(task['Task ID'])) {
+                        li.classList.add('completed-task');
+                    }
+
+                    li.appendChild(a);
+                    taskList.appendChild(li);
+                });
+            } else {
+                taskList.innerHTML = '<li style="color: red;">Failed to load tasks.</li>';
+            }
+        }
+
+        // --- রেফারেল টিম লোড করার ফাংশন (এখন শীট থেকে) ---
+        async function loadReferralTeam() {
+            const referralTeamList = document.getElementById('referral-team-list');
+            referralTeamList.innerHTML = '<li style="opacity: 0.7;">Loading team...</li>';
+
+            // আপনার অ্যাপস স্ক্রিপ্টে Referrals শীট থেকে ডেটা আনার জন্য একটি ফাংশন তৈরি করতে হবে
+            // যা বর্তমান ব্যবহারকারীর রেফার করা সদস্যদের খুঁজে বের করবে।
+            // আপাতত, user.ReferralTeam একটি কমা-সেপারেটেড স্ট্রিং।
+            // ভবিষ্যতে, এটি `fetchFromSheet('Referrals', CURRENT_USER_ID)` দিয়ে লোড হতে পারে।
+            let teamMembers = user.ReferralTeam ? user.ReferralTeam.split(',').map(s => s.trim()).filter(s => s) : [];
+
+            if (teamMembers.length === 0) {
+                referralTeamList.innerHTML = '<li style="opacity: 0.7;">No team members yet.</li>';
+            } else {
+                referralTeamList.innerHTML = '';
+                teamMembers.forEach(memberName => {
+                    const li = document.createElement('li');
+                    li.textContent = memberName;
+                    referralTeamList.appendChild(li);
+                });
+            }
+        }
+
+        // --- লিডারবোর্ড লোড করার ফাংশন ---
+        async function loadLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '<li style="opacity: 0.7;">Loading leaderboard...</li>';
+
+            // 'Users' শীট থেকে সব ইউজার ডেটা লোড করুন
+            const allUsers = await fetchFromSheet('Users');
+
+            if (allUsers && Array.isArray(allUsers)) {
+                // ব্যালেন্স অনুযায়ী ইউজারদের সাজান (descending order)
+                const sortedUsers = allUsers.sort((a, b) => (parseInt(b.Balance) || 0) - (parseInt(a.Balance) || 0));
+
+                leaderboardList.innerHTML = ''; // লোডিং টেক্সট সরান
+
+                sortedUsers.forEach((userEntry, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${index + 1}. ${userEntry['User Name']} - ${userEntry.Balance} pts`;
+                    leaderboardList.appendChild(li);
+                });
+                if (sortedUsers.length === 0) {
+                    leaderboardList.innerHTML = '<li style="opacity: 0.7;">No users on the leaderboard yet.</li>';
+                }
+            } else {
+                leaderboardList.innerHTML = '<li style="color: red;">Failed to load leaderboard.</li>';
+            }
+        }
+
+
+        // --- সেকশন দেখানোর ফাংশন ---
+        function showSection(sectionId) {
+            document.getElementById('main-mining-view').style.display = 'none';
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.querySelectorAll('#bottom-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.style.display = 'flex';
+                if (sectionId === 'tasks-section') {
+                    document.getElementById('tasksNavBtn').classList.add('active');
+                    loadTasks(); // টাস্ক সেকশন খুললে টাস্ক লোড করুন
+                } else if (sectionId === 'referral-team-section') {
+                    document.getElementById('teamNavBtn').classList.add('active');
+                    loadReferralTeam(); // টিম সেকশন খুললে রেফারেল টিম লোড করুন
+                } else if (sectionId === 'leaderboard-section') {
+                    document.getElementById('leaderboardNavBtn').classList.add('active');
+                    loadLeaderboard(); // লিডারবোর্ড সেকশন খুললে লিডারবোর্ড লোড করুন
+                } else if (sectionId === 'referral-section') {
+                    document.getElementById('referralNavBtn').classList.add('active');
+                } else if (sectionId === 'tge-section') {
+                    document.getElementById('tgeNavBtn').classList.add('active');
+                }
+            }
+        }
+
+        // --- মাইনিং ভিউ দেখানোর ফাংশন ---
+        function showMiningView() {
+            document.getElementById('main-mining-view').style.display = 'flex';
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.querySelectorAll('#bottom-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById('mineNavBtn').classList.add('active'); // Mine বাটন active করুন
+            updateButtonState(); // প্রধান ভিউতে ফিরে এলে মাইনিং স্ট্যাটাস আপডেট করুন
+        }
+
+        // --- ইনিশিয়ালাইজেশন ফাংশন ---
+        async function init() {
+            // লোডিং স্টেট দেখান
+            document.getElementById('userId').textContent = "Loading...";
+            document.getElementById('userName').textContent = "Loading...";
+            document.getElementById('balance').textContent = "Loading...";
+            document.getElementById('message').textContent = "Loading user data...";
+            document.getElementById('claimBtn').disabled = true;
+
+
+            // ব্যবহারকারীর ডেটা লোড করুন
+            const fetchedUser = await fetchFromSheet('Users', CURRENT_USER_ID);
+            if (fetchedUser) {
+                user = fetchedUser;
+                document.getElementById('userId').textContent = user['User ID'];
+                document.getElementById('userName').textContent = user['User Name'];
+                document.getElementById('balance').textContent = user.Balance;
+                document.getElementById('yourReferralCode').textContent = user['User ID']; // নিজের রেফারেল কোড দেখানো
+
+                // Google Sheet থেকে আসা `ReferralClaimed` স্ট্রিংটিকে বুলিয়ানে রূপান্তর করুন
+                if (typeof user.ReferralClaimed === 'string') {
+                    user.ReferralClaimed = (user.ReferralClaimed.toUpperCase() === 'TRUE');
+                }
+
+                // Google Sheet থেকে আসা `Balance` স্ট্রিংটিকে ইন্টিজারে রূপান্তর করুন
+                if (typeof user.Balance === 'string') {
+                    user.Balance = parseInt(user.Balance);
+                }
+
+                updateButtonState();
+            } else {
+                console.error("Failed to load user data.");
+                document.getElementById('userId').textContent = "Error";
+                document.getElementById('userName').textContent = "Error";
+                document.getElementById('balance').textContent = "Error";
+                document.getElementById('message').textContent = "Failed to load user data. Please check your sheet and script.";
+                document.getElementById('claimBtn').disabled = true; // Error হলে বাটন ডিজেবল রাখুন
+            }
+            
+            // প্রাথমিক ভাবে প্রধান মাইনিং ভিউ দেখান
+            showMiningView(); // এটি সব সেকশন লুকালেবে এবং mineNavBtn active করবে
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
