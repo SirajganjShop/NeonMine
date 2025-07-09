@@ -278,15 +278,24 @@
         }
 
         #referral-team-list::-webkit-scrollbar-track,
-        #task-list::-webkit-scrollbar-track,
-        #leaderboard-list::-webkit-scrollbar-track {
+        #task-list::-webkit-scrollbar-track {
             background: #3a3a5a;
             border-radius: 10px;
         }
 
         #referral-team-list::-webkit-scrollbar-thumb,
-        #task-list::-webkit-scrollbar-thumb,
-        #leaderboard-list::-webkit-scrollbar-thumb {
+        #task-list::-webkit-scrollbar-thumb {
+            background-color: #5a5a7a;
+            border-radius: 10px;
+            border: 2px solid #3a3a5a;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-track { /* Specific for leaderboard if needed */
+            background: #3a3a5a;
+            border-radius: 10px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-thumb { /* Specific for leaderboard if needed */
             background-color: #5a5a7a;
             border-radius: 10px;
             border: 2px solid #3a3a5a;
